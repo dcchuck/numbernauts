@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://bq8yx3h5m7yn8"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_m8j5v"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_m8j5v")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 512.0
+offset_bottom = 512.0
+color = Color(0.101961, 0.101961, 0.180392, 1)
