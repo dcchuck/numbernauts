@@ -1,5 +1,11 @@
 extends Node2D
 
+# Scene references
+const PLAYER_SCENE = preload("res://scenes/Player.tscn")
+
+# Entity references
+var player: Node2D
+
 # Grid configuration
 const GRID_SIZE: int = 8
 const TILE_SIZE: int = 64
@@ -23,7 +29,22 @@ func setup_game() -> void:
 	current_state = GameState.PLAYING
 	collected_count = 0
 	correct_numbers.clear()
-	# TODO: Generate numbers and initialize entities
+
+	# Spawn player
+	spawn_player()
+
+func spawn_player() -> void:
+	if player:
+		player.queue_free()
+
+	player = PLAYER_SCENE.instantiate()
+	add_child(player)
+	player.initialize(Vector2i(0, 0), self)
+	player.moved.connect(_on_player_moved)
+
+func _on_player_moved(new_position: Vector2i) -> void:
+	print("Main received player move to: ", new_position)
+	# TODO: Check for collectibles, move enemy
 
 func grid_to_world(grid_pos: Vector2i) -> Vector2:
 	"""Convert grid coordinates to world pixel position"""
