@@ -4,11 +4,15 @@ extends Node2D
 const PLAYER_SCENE = preload("res://scenes/Player.tscn")
 const NUMBER_PLANET_SCENE = preload("res://scenes/NumberPlanet.tscn")
 const ENEMY_SCENE = preload("res://scenes/Enemy.tscn")
+const UI_SCENE = preload("res://scenes/UI.tscn")
 
 # Entity references
 var player: Node2D
 var planets: Array[Node2D] = []
 var enemy: Node2D
+
+# UI reference
+var ui: Control
 
 # Grid configuration
 const GRID_SIZE: int = 8
@@ -34,10 +38,35 @@ func setup_game() -> void:
 	collected_count = 0
 	correct_numbers.clear()
 
+	# Setup UI
+	setup_ui()
+
 	# Spawn entities
 	spawn_player()
 	generate_numbers()
 	spawn_enemy()
+
+	# Update UI with initial state
+	update_ui()
+
+func setup_ui() -> void:
+	"""Initialize UI"""
+	if ui:
+		ui.queue_free()
+
+	ui = UI_SCENE.instantiate()
+	add_child(ui)
+	ui.restart_requested.connect(_on_restart_requested)
+	ui.update_challenge(target_multiple)
+
+func update_ui() -> void:
+	"""Update UI displays"""
+	if ui:
+		var total_correct = 0
+		for planet in planets:
+			if planet.is_correct:
+				total_correct += 1
+		ui.update_score(collected_count, total_correct)
 
 func spawn_player() -> void:
 	if player:
@@ -124,12 +153,12 @@ func _on_planet_collected(planet: Node2D) -> void:
 
 	if is_correct:
 		collected_count += 1
-		print("Correct! Collected: %d / %d" % [collected_count, correct_numbers.size()])
-		# TODO: Check win condition
+		update_ui()
+		check_win_condition()
 	else:
 		print("Wrong number! Game Over")
 		current_state = GameState.LOSE
-		# TODO: Trigger game over
+		trigger_game_over()
 
 func spawn_enemy() -> void:
 	"""Spawn enemy with patrol waypoints"""
@@ -153,4 +182,35 @@ func spawn_enemy() -> void:
 func _on_player_caught() -> void:
 	print("GAME OVER - Enemy caught player!")
 	current_state = GameState.LOSE
-	# TODO: Show game over screen
+	trigger_game_over()
+
+func check_win_condition() -> void:
+	"""Check if all correct numbers collected"""
+	var remaining_correct = 0
+	for planet in planets:
+		if planet.is_correct:
+			remaining_correct += 1
+
+	if remaining_correct == 0:
+		current_state = GameState.WIN
+		trigger_win()
+
+func trigger_game_over() -> void:
+	"""Handle game over state"""
+	print("=== GAME OVER ===")
+	if ui:
+		ui.show_game_over()
+	if player:
+		player.can_move = false
+
+func trigger_win() -> void:
+	"""Handle win state"""
+	print("=== YOU WIN ===")
+	if ui:
+		ui.show_win()
+	if player:
+		player.can_move = false
+
+func _on_restart_requested() -> void:
+	print("Restarting game...")
+	setup_game()

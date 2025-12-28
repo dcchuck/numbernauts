@@ -1,0 +1,87 @@
+[gd_scene load_steps=5 format=3 uid="uid://d4j8k2m9p5n7q"]
+
+[ext_resource type="Script" path="res://scripts/ui.gd" id="1_ui"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_challenge"]
+font_size = 20
+
+[sub_resource type="LabelSettings" id="LabelSettings_score"]
+font_size = 16
+
+[sub_resource type="LabelSettings" id="LabelSettings_endgame"]
+font_size = 32
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ui")
+
+[node name="ChallengeLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 30.0
+grow_horizontal = 2
+text = "Collect all multiples of 3!"
+label_settings = SubResource("LabelSettings_challenge")
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 40.0
+offset_bottom = 60.0
+grow_horizontal = 2
+text = "Collected: 0 / 0"
+label_settings = SubResource("LabelSettings_score")
+horizontal_alignment = 1
+
+[node name="GameOverContainer" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameOverContainer"]
+layout_mode = 2
+
+[node name="GameOverLabel" type="Label" parent="GameOverContainer/VBoxContainer"]
+layout_mode = 2
+text = "GAME OVER"
+label_settings = SubResource("LabelSettings_endgame")
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="GameOverContainer/VBoxContainer"]
+layout_mode = 2
+text = "Restart"
+
+[node name="WinContainer" type="CenterContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WinContainer"]
+layout_mode = 2
+
+[node name="WinLabel" type="Label" parent="WinContainer/VBoxContainer"]
+layout_mode = 2
+text = "YOU WIN!"
+label_settings = SubResource("LabelSettings_endgame")
+horizontal_alignment = 1
+
+[node name="WinRestartButton" type="Button" parent="WinContainer/VBoxContainer"]
+layout_mode = 2
+text = "Play Again"
