@@ -47,8 +47,8 @@ func _on_player_moved(new_position: Vector2i) -> void:
 	# TODO: Check for collectibles, move enemy
 
 func grid_to_world(grid_pos: Vector2i) -> Vector2:
-	"""Convert grid coordinates to world pixel position"""
-	return Vector2(grid_pos.x * TILE_SIZE, grid_pos.y * TILE_SIZE)
+	"""Convert grid coordinates to world pixel position (centered)"""
+	return Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
 
 func world_to_grid(world_pos: Vector2) -> Vector2i:
 	"""Convert world pixel position to grid coordinates"""
