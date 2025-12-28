@@ -3,10 +3,12 @@ extends Node2D
 # Scene references
 const PLAYER_SCENE = preload("res://scenes/Player.tscn")
 const NUMBER_PLANET_SCENE = preload("res://scenes/NumberPlanet.tscn")
+const ENEMY_SCENE = preload("res://scenes/Enemy.tscn")
 
 # Entity references
 var player: Node2D
 var planets: Array[Node2D] = []
+var enemy: Node2D
 
 # Grid configuration
 const GRID_SIZE: int = 8
@@ -32,11 +34,10 @@ func setup_game() -> void:
 	collected_count = 0
 	correct_numbers.clear()
 
-	# Spawn player
+	# Spawn entities
 	spawn_player()
-
-	# Generate collectible numbers
 	generate_numbers()
+	spawn_enemy()
 
 func spawn_player() -> void:
 	if player:
@@ -49,7 +50,10 @@ func spawn_player() -> void:
 
 func _on_player_moved(new_position: Vector2i) -> void:
 	print("Main received player move to: ", new_position)
-	# TODO: Check for collectibles, move enemy
+
+	# Enemy's turn to move
+	if enemy and current_state == GameState.PLAYING:
+		enemy.move_toward_waypoint()
 
 func grid_to_world(grid_pos: Vector2i) -> Vector2:
 	"""Convert grid coordinates to world pixel position (centered)"""
@@ -126,3 +130,27 @@ func _on_planet_collected(planet: Node2D) -> void:
 		print("Wrong number! Game Over")
 		current_state = GameState.LOSE
 		# TODO: Trigger game over
+
+func spawn_enemy() -> void:
+	"""Spawn enemy with patrol waypoints"""
+	if enemy:
+		enemy.queue_free()
+
+	enemy = ENEMY_SCENE.instantiate()
+	add_child(enemy)
+
+	# Define patrol route (square pattern)
+	var patrol_waypoints: Array[Vector2i] = [
+		Vector2i(2, 2),
+		Vector2i(2, 6),
+		Vector2i(6, 6),
+		Vector2i(6, 2)
+	]
+
+	enemy.initialize(Vector2i(2, 2), patrol_waypoints)
+	enemy.player_caught.connect(_on_player_caught)
+
+func _on_player_caught() -> void:
+	print("GAME OVER - Enemy caught player!")
+	current_state = GameState.LOSE
+	# TODO: Show game over screen
