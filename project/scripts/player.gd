@@ -5,6 +5,10 @@ var grid_position: Vector2i = Vector2i(0, 0)
 const TILE_SIZE: int = 64
 var can_move: bool = true
 
+# Movement animation
+var is_moving: bool = false
+var move_speed: float = 8.0  # Grid spaces per second
+
 # Reference to main game
 var main_node: Node2D
 
@@ -53,14 +57,28 @@ func _input(event: InputEvent) -> void:
 		attempt_move(direction)
 
 func attempt_move(direction: Vector2i) -> void:
+	if is_moving:
+		return  # Don't allow movement while animating
+
 	var new_position = grid_position + direction
 
 	# Check bounds using main's validation
 	if main_node and main_node.is_valid_grid_position(new_position):
 		grid_position = new_position
-		position = grid_to_world(grid_position)
-		moved.emit(grid_position)
-		print("Player moved to: ", grid_position)
+		is_moving = true
+		can_move = false
+
+		# Animate to new position
+		var target_pos = grid_to_world(grid_position)
+		var tween = create_tween()
+		tween.tween_property(self, "position", target_pos, 1.0 / move_speed)
+		tween.finished.connect(_on_move_finished)
+
+func _on_move_finished() -> void:
+	is_moving = false
+	can_move = true
+	moved.emit(grid_position)
+	print("Player moved to: ", grid_position)
 
 func grid_to_world(grid_pos: Vector2i) -> Vector2:
 	"""Convert grid coordinates to world position"""

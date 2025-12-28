@@ -8,6 +8,10 @@ var current_waypoint_index: int = 0
 var grid_position: Vector2i = Vector2i(2, 2)
 const TILE_SIZE: int = 64
 
+# Movement animation
+var is_moving: bool = false
+var move_speed: float = 6.0
+
 signal player_caught
 
 func _ready() -> void:
@@ -25,7 +29,7 @@ func initialize(start_pos: Vector2i, patrol_waypoints: Array[Vector2i]) -> void:
 
 func move_toward_waypoint() -> void:
 	"""Move one step toward the current waypoint"""
-	if waypoints.is_empty():
+	if waypoints.is_empty() or is_moving:
 		return
 
 	var target = waypoints[current_waypoint_index]
@@ -44,10 +48,21 @@ func move_toward_waypoint() -> void:
 	# Move if we have a direction
 	if direction != Vector2i.ZERO:
 		grid_position += direction
-		position = grid_to_world(grid_position)
+		is_moving = true
+
+		# Animate to new position
+		var target_pos = grid_to_world(grid_position)
+		var tween = create_tween()
+		tween.tween_property(self, "position", target_pos, 1.0 / move_speed)
+		tween.finished.connect(_on_move_finished)
+
 		print("Enemy moved to: ", grid_position)
 
+func _on_move_finished() -> void:
+	is_moving = false
+
 	# Check if reached waypoint
+	var target = waypoints[current_waypoint_index]
 	if grid_position == target:
 		advance_waypoint()
 

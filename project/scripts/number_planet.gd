@@ -16,15 +16,17 @@ func initialize(value: int, correct: bool, grid_pos: Vector2i) -> void:
 	"""Set up the planet with number value and position"""
 	number_value = value
 	is_correct = correct
-	$Label.text = str(value)
+	label.text = str(value)
 
 	# Position at grid location (centered)
 	const TILE_SIZE = 64
 	position = Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
 
-	# Visual feedback for correct numbers (optional)
+	# Visual feedback for correct numbers
 	if is_correct:
-		modulate = Color(0.2, 0.8, 0.3)  # Green tint
+		$Sprite2D.modulate = Color(0.3, 0.9, 0.4)  # Green
+	else:
+		$Sprite2D.modulate = Color(0.4, 0.6, 0.9)  # Blue
 
 func _on_body_entered(body: Node2D) -> void:
 	# Detect player collision (if using CharacterBody2D)
@@ -35,6 +37,10 @@ func _on_area_entered(area: Area2D) -> void:
 	check_collection()
 
 func check_collection() -> void:
-	"""Trigger collection and remove planet"""
+	"""Trigger collection with animation"""
 	collected.emit(self)
-	queue_free()
+
+	# Quick scale-down animation
+	var tween = create_tween()
+	tween.tween_property(self, "scale", Vector2.ZERO, 0.15)
+	tween.finished.connect(queue_free)
