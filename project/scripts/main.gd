@@ -2,9 +2,11 @@ extends Node2D
 
 # Scene references
 const PLAYER_SCENE = preload("res://scenes/Player.tscn")
+const NUMBER_PLANET_SCENE = preload("res://scenes/NumberPlanet.tscn")
 
 # Entity references
 var player: Node2D
+var planets: Array[Node2D] = []
 
 # Grid configuration
 const GRID_SIZE: int = 8
@@ -33,6 +35,9 @@ func setup_game() -> void:
 	# Spawn player
 	spawn_player()
 
+	# Generate collectible numbers
+	generate_numbers()
+
 func spawn_player() -> void:
 	if player:
 		player.queue_free()
@@ -57,3 +62,65 @@ func world_to_grid(world_pos: Vector2) -> Vector2i:
 func is_valid_grid_position(grid_pos: Vector2i) -> bool:
 	"""Check if grid position is within bounds"""
 	return grid_pos.x >= 0 and grid_pos.x < GRID_SIZE and grid_pos.y >= 0 and grid_pos.y < GRID_SIZE
+
+func generate_numbers() -> void:
+	"""Generate random numbers on grid, mark correct ones"""
+	# Clear existing planets
+	for planet in planets:
+		planet.queue_free()
+	planets.clear()
+
+	# Calculate correct answers (multiples of target_multiple)
+	correct_numbers.clear()
+	for i in range(1, 51):
+		if i % target_multiple == 0:
+			correct_numbers.append(i)
+
+	# Generate random positions for numbers
+	var used_positions: Array[Vector2i] = []
+	used_positions.append(Vector2i(0, 0))  # Player start position
+
+	# Place 15-20 random numbers
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+
+	for i in range(15):
+		# Get random position
+		var grid_pos: Vector2i
+		var attempts = 0
+		while attempts < 100:
+			grid_pos = Vector2i(rng.randi_range(0, GRID_SIZE - 1), rng.randi_range(0, GRID_SIZE - 1))
+			if not used_positions.has(grid_pos):
+				break
+			attempts += 1
+
+		if attempts >= 100:
+			continue  # Skip if can't find position
+
+		used_positions.append(grid_pos)
+
+		# Get random number value
+		var value = rng.randi_range(1, 50)
+		var is_correct = (value % target_multiple == 0)
+
+		# Spawn planet
+		var planet = NUMBER_PLANET_SCENE.instantiate()
+		add_child(planet)
+		planet.initialize(value, is_correct, grid_pos)
+		planet.collected.connect(_on_planet_collected)
+		planets.append(planet)
+
+func _on_planet_collected(planet: Node2D) -> void:
+	var value = planet.number_value
+	var is_correct = planet.is_correct
+
+	print("Collected number: ", value, " (correct: ", is_correct, ")")
+
+	if is_correct:
+		collected_count += 1
+		print("Correct! Collected: %d / %d" % [collected_count, correct_numbers.size()])
+		# TODO: Check win condition
+	else:
+		print("Wrong number! Game Over")
+		current_state = GameState.LOSE
+		# TODO: Trigger game over

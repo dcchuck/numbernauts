@@ -8,10 +8,23 @@ var can_move: bool = true
 # Reference to main game
 var main_node: Node2D
 
+# Add Area2D for detecting collectibles
+var detection_area: Area2D
+
 signal moved(new_position: Vector2i)
 signal number_collected(value: int)
 
 func _ready() -> void:
+	# Create collision detection area
+	detection_area = Area2D.new()
+	add_child(detection_area)
+
+	var collision_shape = CollisionShape2D.new()
+	var circle = CircleShape2D.new()
+	circle.radius = 24
+	collision_shape.shape = circle
+	detection_area.add_child(collision_shape)
+
 	# Position at grid location
 	position = grid_to_world(grid_position)
 
