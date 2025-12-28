@@ -111,6 +111,8 @@ func generate_numbers() -> void:
 		planets.append(planet)
 
 func _on_planet_collected(planet: Node2D) -> void:
+	planets.erase(planet)
+
 	var value = planet.number_value
 	var is_correct = planet.is_correct
 

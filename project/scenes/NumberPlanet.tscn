@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://c4y3v8m5q8h3w"]
+[gd_scene load_steps=5 format=3 uid="uid://c4y3v8m5q8h3w"]
 
 [ext_resource type="Script" path="res://scripts/number_planet.gd" id="1_1k2v3"]
 
@@ -7,6 +7,9 @@ size = Vector2(48, 48)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1k2v3"]
 radius = 24.0
+
+[sub_resource type="LabelSettings" id="LabelSettings_1k2v3"]
+font_size = 24
 
 [node name="NumberPlanet" type="Node2D"]
 script = ExtResource("1_1k2v3")
@@ -26,5 +29,6 @@ offset_top = -12.0
 offset_right = 12.0
 offset_bottom = 12.0
 text = "0"
+label_settings = SubResource("LabelSettings_1k2v3")
 horizontal_alignment = 1
 vertical_alignment = 1
