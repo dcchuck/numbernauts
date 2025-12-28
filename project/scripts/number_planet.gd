@@ -16,7 +16,7 @@ func initialize(value: int, correct: bool, grid_pos: Vector2i) -> void:
 	"""Set up the planet with number value and position"""
 	number_value = value
 	is_correct = correct
-	label.text = str(value)
+	$Label.text = str(value)
 
 	# Position at grid location (centered)
 	const TILE_SIZE = 64
