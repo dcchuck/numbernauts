@@ -75,6 +75,7 @@ func spawn_player() -> void:
 	player = PLAYER_SCENE.instantiate()
 	add_child(player)
 	player.initialize(Vector2i(0, 0), self)
+	player.can_move = true  # Explicit initialization to ensure movement is enabled
 	player.moved.connect(_on_player_moved)
 
 func _on_player_moved(new_position: Vector2i) -> void:
