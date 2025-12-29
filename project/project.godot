@@ -12,14 +12,10 @@ config_version=5
 
 config/name="Numbernauts"
 run/main_scene="res://scenes/Main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 
 [display]
 
 window/size/viewport_width=512
 window/size/viewport_height=512
 window/size/resizable=false
-
-[rendering]
-
-renderer/rendering_method="forward_plus"
