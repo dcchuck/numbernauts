@@ -12,15 +12,15 @@ func _ready() -> void:
 	collision_area.body_entered.connect(_on_body_entered)
 	collision_area.area_entered.connect(_on_area_entered)
 
-func initialize(value: int, correct: bool, grid_pos: Vector2i) -> void:
+func initialize(value: int, correct: bool, world_pos: Vector2) -> void:
 	"""Set up the planet with number value and position"""
 	number_value = value
 	is_correct = correct
 	label.text = str(value)
 
-	# Position at grid location (centered)
-	const TILE_SIZE = 64
-	position = Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
+	# Position at world location (already converted from grid)
+	position = world_pos
+	scale = Vector2(1.94, 1.94)
 
 	# Visual feedback for correct numbers
 	if is_correct:

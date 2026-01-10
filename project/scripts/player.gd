@@ -29,14 +29,17 @@ func _ready() -> void:
 	collision_shape.shape = circle
 	detection_area.add_child(collision_shape)
 
-	# Position at grid location
-	position = grid_to_world(grid_position)
+	# Position at grid location (using main's conversion if available)
+	if main_node:
+		position = main_node.grid_to_world(grid_position)
 
 func initialize(start_pos: Vector2i, main_ref: Node2D) -> void:
 	"""Set starting position and main reference"""
 	grid_position = start_pos
 	main_node = main_ref
-	position = grid_to_world(grid_position)
+	if main_node:
+		position = main_node.grid_to_world(grid_position)
+		scale = Vector2(main_node.SPRITE_SCALE, main_node.SPRITE_SCALE)
 
 func _input(event: InputEvent) -> void:
 	if not can_move:
@@ -69,7 +72,7 @@ func attempt_move(direction: Vector2i) -> void:
 		can_move = false
 
 		# Animate to new position
-		var target_pos = grid_to_world(grid_position)
+		var target_pos = main_node.grid_to_world(grid_position)
 		var tween = create_tween()
 		tween.tween_property(self, "position", target_pos, 1.0 / move_speed)
 		tween.finished.connect(_on_move_finished)
@@ -79,7 +82,3 @@ func _on_move_finished() -> void:
 	can_move = true
 	moved.emit(grid_position)
 	print("Player moved to: ", grid_position)
-
-func grid_to_world(grid_pos: Vector2i) -> Vector2:
-	"""Convert grid coordinates to world position"""
-	return Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)

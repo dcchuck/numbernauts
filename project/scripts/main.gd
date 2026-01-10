@@ -14,9 +14,23 @@ var enemy: Node2D
 # UI reference
 var ui: CanvasLayer
 
+# Viewport configuration
+const VIEWPORT_WIDTH: int = 1080
+const VIEWPORT_HEIGHT: int = 1920
+const BOARD_PADDING_PERCENT: float = 4.0  # Percentage of viewport width
+
 # Grid configuration
 const GRID_SIZE: int = 8
-const TILE_SIZE: int = 64
+const TILE_SIZE: int = 124  # Calculated to fill VIEWPORT_WIDTH with BOARD_PADDING_PERCENT
+
+# Calculated offsets (used in coordinate conversion)
+const BOARD_WIDTH: int = GRID_SIZE * TILE_SIZE  # 992
+const BOARD_HEIGHT: int = GRID_SIZE * TILE_SIZE  # 992
+const OFFSET_X: int = (VIEWPORT_WIDTH - BOARD_WIDTH) / 2  # 44
+const OFFSET_Y: int = (VIEWPORT_HEIGHT - BOARD_HEIGHT) / 2  # 464
+
+# Sprite scaling (to maintain visual size relative to tiles)
+const SPRITE_SCALE: float = 1.94  # 124/64 = tile size ratio
 
 # Game state
 enum GameState { PLAYING, WIN, LOSE }
@@ -87,11 +101,17 @@ func _on_player_moved(new_position: Vector2i) -> void:
 
 func grid_to_world(grid_pos: Vector2i) -> Vector2:
 	"""Convert grid coordinates to world pixel position (centered)"""
-	return Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
+	return Vector2(
+		grid_pos.x * TILE_SIZE + TILE_SIZE / 2 + OFFSET_X,
+		grid_pos.y * TILE_SIZE + TILE_SIZE / 2 + OFFSET_Y
+	)
 
 func world_to_grid(world_pos: Vector2) -> Vector2i:
 	"""Convert world pixel position to grid coordinates"""
-	return Vector2i(int(world_pos.x / TILE_SIZE), int(world_pos.y / TILE_SIZE))
+	return Vector2i(
+		int((world_pos.x - OFFSET_X) / TILE_SIZE),
+		int((world_pos.y - OFFSET_Y) / TILE_SIZE)
+	)
 
 func is_valid_grid_position(grid_pos: Vector2i) -> bool:
 	"""Check if grid position is within bounds"""
@@ -140,7 +160,8 @@ func generate_numbers() -> void:
 		# Spawn planet
 		var planet = NUMBER_PLANET_SCENE.instantiate()
 		add_child(planet)
-		planet.initialize(value, is_correct, grid_pos)
+		var world_pos = grid_to_world(grid_pos)
+		planet.initialize(value, is_correct, world_pos)
 		planet.collected.connect(_on_planet_collected)
 		planets.append(planet)
 
@@ -177,7 +198,7 @@ func spawn_enemy() -> void:
 		Vector2i(6, 2)
 	]
 
-	enemy.initialize(Vector2i(2, 2), patrol_waypoints)
+	enemy.initialize(Vector2i(2, 2), patrol_waypoints, self)
 	enemy.player_caught.connect(_on_player_caught)
 
 func _on_player_caught() -> void:

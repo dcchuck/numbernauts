@@ -8,6 +8,9 @@ var current_waypoint_index: int = 0
 var grid_position: Vector2i = Vector2i(2, 2)
 const TILE_SIZE: int = 64
 
+# Reference to main game
+var main_node: Node2D
+
 # Movement animation
 var is_moving: bool = false
 var move_speed: float = 6.0
@@ -18,12 +21,15 @@ func _ready() -> void:
 	collision_area.body_entered.connect(_on_body_entered)
 	collision_area.area_entered.connect(_on_area_entered)
 
-func initialize(start_pos: Vector2i, patrol_waypoints: Array[Vector2i]) -> void:
+func initialize(start_pos: Vector2i, patrol_waypoints: Array[Vector2i], main_ref: Node2D) -> void:
 	"""Set up enemy starting position and patrol route"""
 	grid_position = start_pos
 	waypoints = patrol_waypoints
 	current_waypoint_index = 0
-	position = grid_to_world(grid_position)
+	main_node = main_ref
+	if main_node:
+		position = main_node.grid_to_world(grid_position)
+		scale = Vector2(main_node.SPRITE_SCALE, main_node.SPRITE_SCALE)
 	print("Enemy initialized at: ", grid_position)
 	print("Patrol waypoints: ", waypoints)
 
@@ -46,12 +52,12 @@ func move_toward_waypoint() -> void:
 		direction = Vector2i.UP
 
 	# Move if we have a direction
-	if direction != Vector2i.ZERO:
+	if direction != Vector2i.ZERO and main_node:
 		grid_position += direction
 		is_moving = true
 
 		# Animate to new position
-		var target_pos = grid_to_world(grid_position)
+		var target_pos = main_node.grid_to_world(grid_position)
 		var tween = create_tween()
 		tween.tween_property(self, "position", target_pos, 1.0 / move_speed)
 		tween.finished.connect(_on_move_finished)
@@ -70,10 +76,6 @@ func advance_waypoint() -> void:
 	"""Move to next waypoint in patrol route"""
 	current_waypoint_index = (current_waypoint_index + 1) % waypoints.size()
 	print("Enemy reached waypoint, next target: ", waypoints[current_waypoint_index])
-
-func grid_to_world(grid_pos: Vector2i) -> Vector2:
-	"""Convert grid coordinates to world position"""
-	return Vector2(grid_pos.x * TILE_SIZE + TILE_SIZE / 2, grid_pos.y * TILE_SIZE + TILE_SIZE / 2)
 
 func _on_body_entered(body: Node2D) -> void:
 	check_player_collision()
