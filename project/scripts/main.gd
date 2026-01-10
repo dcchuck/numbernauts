@@ -12,7 +12,7 @@ var planets: Array[Node2D] = []
 var enemy: Node2D
 
 # UI reference
-var ui: Control
+var ui: CanvasLayer
 
 # Grid configuration
 const GRID_SIZE: int = 8

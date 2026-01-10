@@ -1,11 +1,11 @@
-extends Control
+extends CanvasLayer
 
-@onready var challenge_label: Label = $ChallengeLabel
-@onready var score_label: Label = $ScoreLabel
-@onready var game_over_container: CenterContainer = $GameOverContainer
-@onready var win_container: CenterContainer = $WinContainer
-@onready var restart_button: Button = $GameOverContainer/VBoxContainer/RestartButton
-@onready var win_restart_button: Button = $WinContainer/VBoxContainer/WinRestartButton
+@onready var challenge_label: Label = $Container/ChallengeLabel
+@onready var score_label: Label = $Container/ScoreLabel
+@onready var game_over_container: CenterContainer = $Container/GameOverContainer
+@onready var win_container: CenterContainer = $Container/WinContainer
+@onready var restart_button: Button = $Container/GameOverContainer/VBoxContainer/RestartButton
+@onready var win_restart_button: Button = $Container/WinContainer/VBoxContainer/WinRestartButton
 
 signal restart_requested
 
