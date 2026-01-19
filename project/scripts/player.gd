@@ -33,6 +33,9 @@ func _ready() -> void:
 	if main_node:
 		position = main_node.grid_to_world(grid_position)
 
+	# Start playing default animation
+	$AnimatedSprite2D.play("down")
+
 func initialize(start_pos: Vector2i, main_ref: Node2D) -> void:
 	"""Set starting position and main reference"""
 	grid_position = start_pos
@@ -40,6 +43,17 @@ func initialize(start_pos: Vector2i, main_ref: Node2D) -> void:
 	if main_node:
 		position = main_node.grid_to_world(grid_position)
 		scale = Vector2(main_node.SPRITE_SCALE, main_node.SPRITE_SCALE)
+
+func update_animation(direction: Vector2i) -> void:
+	"""Update animation based on movement direction"""
+	if direction.y > 0:
+		$AnimatedSprite2D.play("down")
+	elif direction.y < 0:
+		$AnimatedSprite2D.play("up")
+	elif direction.x < 0:
+		$AnimatedSprite2D.play("left")
+	elif direction.x > 0:
+		$AnimatedSprite2D.play("right")
 
 func _input(event: InputEvent) -> void:
 	if not can_move:
@@ -67,6 +81,9 @@ func attempt_move(direction: Vector2i) -> void:
 
 	# Check bounds using main's validation
 	if main_node and main_node.is_valid_grid_position(new_position):
+		# Update animation based on movement direction
+		update_animation(direction)
+
 		grid_position = new_position
 		is_moving = true
 		can_move = false
