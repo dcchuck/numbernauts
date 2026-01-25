@@ -18,6 +18,8 @@ var detection_area: Area2D
 signal moved(new_position: Vector2i)
 signal number_collected(value: int)
 
+var current_direction: String = "down"
+
 func _ready() -> void:
 	# Create collision detection area
 	detection_area = Area2D.new()
@@ -33,8 +35,9 @@ func _ready() -> void:
 	if main_node:
 		position = main_node.grid_to_world(grid_position)
 
-	# Start playing default animation
-	$AnimatedSprite2D.play("down")
+	# Set initial frame but don't animate (resting state)
+	$AnimatedSprite2D.animation = current_direction
+	$AnimatedSprite2D.stop()
 
 func initialize(start_pos: Vector2i, main_ref: Node2D) -> void:
 	"""Set starting position and main reference"""
@@ -45,15 +48,21 @@ func initialize(start_pos: Vector2i, main_ref: Node2D) -> void:
 		scale = Vector2(main_node.SPRITE_SCALE, main_node.SPRITE_SCALE)
 
 func update_animation(direction: Vector2i) -> void:
-	"""Update animation based on movement direction"""
+	"""Update and play animation based on movement direction"""
 	if direction.y > 0:
-		$AnimatedSprite2D.play("down")
+		current_direction = "down"
 	elif direction.y < 0:
-		$AnimatedSprite2D.play("up")
+		current_direction = "up"
 	elif direction.x < 0:
-		$AnimatedSprite2D.play("left")
+		current_direction = "left"
 	elif direction.x > 0:
-		$AnimatedSprite2D.play("right")
+		current_direction = "right"
+
+	$AnimatedSprite2D.play(current_direction)
+
+func stop_animation() -> void:
+	"""Stop animation and hold current frame (resting state)"""
+	$AnimatedSprite2D.stop()
 
 func _input(event: InputEvent) -> void:
 	if not can_move:
@@ -97,5 +106,6 @@ func attempt_move(direction: Vector2i) -> void:
 func _on_move_finished() -> void:
 	is_moving = false
 	can_move = true
+	stop_animation()  # Return to resting state
 	moved.emit(grid_position)
 	print("Player moved to: ", grid_position)

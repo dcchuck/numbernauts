@@ -3,6 +3,10 @@
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_player"]
 [ext_resource type="Texture2D" uid="uid://unique_sprite_id" path="res://assets/sprites/player_astronaut_spritesheet.png" id="2_sprite"]
 
+; Spritesheet: 1024x1536 pixels, 5 rows x 3 columns
+; Frame size: 341x307 pixels (1024/3 ≈ 341, 1536/5 ≈ 307)
+; Row 0: Down, Row 1: Left, Row 2: Right, Row 3: Up, Row 4: Boost (unused)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_down_0"]
 atlas = ExtResource("2_sprite")
 region = Rect2(0, 0, 341, 307)
@@ -114,7 +118,7 @@ animations = [{
 script = ExtResource("1_player")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-scale = Vector2(0.141, 0.141)
+scale = Vector2(0.18, 0.18)
 sprite_frames = SubResource("SpriteFrames_1")
 animation = &"down"
 centered = true
